@@ -1,3 +1,16 @@
 # Kilo Web UI
 
-This is the web interface for kilo - a headless API service.
+Web interface for kilo - headless API service.
+
+## Setup
+
+```bash
+npm install
+npm run dev
+```
+
+## API Endpoints
+
+- `/session` - List chat sessions
+- `/agent` - List available agents
+- `/run` - Execute agent tasks

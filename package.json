@@ -1,0 +1,16 @@
+{
+  "name": "kilo-ui",
+  "version": "1.0.0",
+  "description": "Web interface for kilo - headless API service.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.2",
+    "vite": "^8.0.13"
+  }
+}
