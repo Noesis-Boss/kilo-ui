@@ -29,3 +29,13 @@ export async function runTask(agent: string, input: any): Promise<any> {
   if (!res.ok) throw new Error('Task failed')
   return res.json()
 }
+
+export async function createSession(slug: string): Promise<Session> {
+  const res = await fetch(`${base}/session`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug })
+  })
+  if (!res.ok) throw new Error('Failed to create session')
+  return res.json()
+}
