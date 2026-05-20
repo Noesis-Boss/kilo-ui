@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { listSessions } from './api/kilo'
 import type { Session } from './api/kilo'
+import TaskRunner from './components/TaskRunner'
 
 function App() {
   const [sessions, setSessions] = useState<Session[]>([])
@@ -16,8 +17,9 @@ function App() {
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
       <h1>Kilo Web UI</h1>
+      <TaskRunner />
       {loading ? (
-        <p>Loading...</p>
+        <p>Loading sessions...</p>
       ) : (
         <ul>
           {sessions.map(s => (
