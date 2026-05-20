@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { listSessions, listAgents, runTask, type Session } from './api/kilo'
+import { listSessions, listAgents, runTask, createSession, type Session } from './api/kilo'
 
 type Tab = 'sessions' | 'taskRunner'
 
@@ -34,6 +34,9 @@ function SessionsView() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedSession, setSelectedSession] = useState<Session | null>(null)
+  const [createLoading, setCreateLoading] = useState(false)
+  const [slug, setSlug] = useState('')
+  const [message, setMessage] = useState<string | null>(null)
 
   const fetchSessions = useCallback(async () => {
     setLoading(true)
@@ -56,6 +59,29 @@ function SessionsView() {
     if (!loading) fetchSessions()
   }
 
+  const handleCreateSession = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!slug.trim()) {
+      setError('Session slug is required')
+      return
+    }
+
+    setCreateLoading(true)
+    setError(null)
+    setMessage(null)
+
+    try {
+      const newSession = await createSession(slug.trim())
+      setSessions(prev => [...prev, newSession])
+      setSlug('')
+      setMessage('Session created successfully!')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create session')
+    } finally {
+      setCreateLoading(false)
+    }
+  }
+
   return (
     <div>
       <div className="page-header">
@@ -68,6 +94,29 @@ function SessionsView() {
           {loading ? 'Refreshing\u2026' : 'Refresh'}
         </button>
       </div>
+
+      <form onSubmit={handleCreateSession} className="form-group">
+        <div className="flex gap-3 mb-2">
+          <input
+            type="text"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="Enter session slug"
+            disabled={createLoading}
+            className="form-input"
+          />
+          <button
+            type="submit"
+            disabled={createLoading || !slug.trim()}
+            className="btn btn--primary"
+          >
+            {createLoading ? 'Creating\u2026' : 'Create Session'}
+          </button>
+        </div>
+        {message && (
+          <span className="text-success">{message}</span>
+        )}
+      </form>
 
       {error && (
         <div className="alert alert--danger">
