@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { listSessions, listAgents, runTask } from './api/kilo'
-import type { Session } from './api/kilo'
+import { listSessions, listAgents, runTask, type Session } from './api/kilo'
 
 type Tab = 'sessions' | 'taskRunner'
 
@@ -8,8 +7,8 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>('sessions')
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: 20, fontFamily: 'system-ui, sans-serif' }}>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+    <div className="app-layout">
+      <div className="tabs">
         {[
           { key: 'sessions' as Tab, label: 'Sessions' },
           { key: 'taskRunner' as Tab, label: 'Task Runner' },
@@ -17,15 +16,7 @@ function App() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            style={{
-              padding: '8px 20px',
-              cursor: 'pointer',
-              borderRadius: 6,
-              border: tab.key === activeTab ? '1px solid #4a6cf7' : '1px solid #ccc',
-              background: tab.key === activeTab ? '#4a6cf7' : '#f5f5f5',
-              color: tab.key === activeTab ? '#fff' : '#333',
-              fontWeight: tab.key === activeTab ? 600 : 400,
-            }}
+            className={tab.key === activeTab ? 'tab-btn tab-btn--active' : 'tab-btn'}
           >
             {tab.label}
           </button>
@@ -67,68 +58,57 @@ function SessionsView() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1 style={{ margin: 0 }}>Sessions</h1>
+      <div className="page-header">
+        <h1 className="page-header__title">Sessions</h1>
         <button
           onClick={handleRefresh}
           disabled={loading}
-          style={{
-            padding: '8px 16px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.5 : 1,
-            borderRadius: 6,
-            border: '1px solid #ccc',
-            background: '#f5f5f5',
-          }}
+          className={loading ? 'btn btn--sm' : 'btn btn--sm'}
         >
-          {loading ? 'Refreshing...' : 'Refresh'}
+          {loading ? 'Refreshing\u2026' : 'Refresh'}
         </button>
       </div>
 
       {error && (
-        <div style={{ background: '#fff0f0', color: '#cc0000', padding: 12, borderRadius: 6, marginBottom: 16, border: '1px solid #ffcccc' }}>
-          {error}
-          <button
-            onClick={fetchSessions}
-            style={{ marginLeft: 12, padding: '4px 12px', cursor: 'pointer', borderRadius: 4, border: '1px solid #cc0000', background: '#fff' }}
-          >
+        <div className="alert alert--danger">
+          <span>{error}</span>
+          <button onClick={fetchSessions} className="btn btn--sm">
             Retry
           </button>
         </div>
       )}
 
       {loading && !error && (
-        <p style={{ color: '#666' }}>Loading sessions...</p>
+        <p className="loading-state">Loading sessions...</p>
       )}
 
       {!loading && !error && sessions.length === 0 && (
-        <p style={{ color: '#666' }}>No sessions found.</p>
+        <p className="text-muted">No sessions found.</p>
       )}
 
       {!loading && !error && sessions.length > 0 && (
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <ul className="card-list">
           {sessions.map(s => (
             <li
               key={s.id}
               onClick={() => setSelectedSession(selectedSession?.id === s.id ? null : s)}
-              style={{
-                padding: '12px 16px',
-                border: '1px solid #ddd',
-                borderRadius: 6,
-                cursor: 'pointer',
-                background: selectedSession?.id === s.id ? '#e8f0ff' : '#fff',
-                transition: 'background 0.15s',
-              }}
+              className={[
+                'card',
+                'card--clickable',
+                selectedSession?.id === s.id ? 'card--selected' : '',
+              ].join(' ')}
             >
-              <strong>{s.slug}</strong>
-              <span style={{ color: '#666', marginLeft: 12 }}>({s.projectID})</span>
+              <span>
+                <strong>{s.slug}</strong>
+                <span className="text-secondary ml-3">({s.projectID})</span>
+              </span>
               {selectedSession?.id === s.id && (
-                <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #ccc', fontSize: 14, color: '#333' }}>
-                  <div><strong>ID:</strong> {s.id}</div>
-                  <div><strong>Project ID:</strong> {s.projectID}</div>
-                  <div><strong>Pattern:</strong> {s.pattern}</div>
-                  <div><strong>Action:</strong> {s.action}</div>
-                  <div><strong>Slug:</strong> {s.slug}</div>
+                <div className="detail-panel">
+                  <div className="detail-panel__row"><strong>ID:</strong> {s.id}</div>
+                  <div className="detail-panel__row"><strong>Project ID:</strong> {s.projectID}</div>
+                  <div className="detail-panel__row"><strong>Pattern:</strong> {s.pattern}</div>
+                  <div className="detail-panel__row"><strong>Action:</strong> {s.action}</div>
+                  <div className="detail-panel__row"><strong>Slug:</strong> {s.slug}</div>
                 </div>
               )}
             </li>
@@ -182,14 +162,14 @@ function TaskRunnerPage() {
 
   return (
     <div>
-      <h1 style={{ margin: '0 0 24px 0' }}>Task Runner</h1>
+      <h1 className="page-header__title mb-6">Task Runner</h1>
 
       {agentsError && (
-        <div style={{ background: '#fff0f0', color: '#cc0000', padding: 12, borderRadius: 6, marginBottom: 16, border: '1px solid #ffcccc' }}>
-          {agentsError}
+        <div className="alert alert--danger mb-4">
+          <span>{agentsError}</span>
           <button
             onClick={() => listAgents().then(d => setAgents(d)).catch(e => setAgentsError(e.message))}
-            style={{ marginLeft: 12, padding: '4px 12px', cursor: 'pointer', borderRadius: 4, border: '1px solid #cc0000', background: '#fff' }}
+            className="btn btn--sm"
           >
             Retry
           </button>
@@ -197,27 +177,19 @@ function TaskRunnerPage() {
       )}
 
       {agentsLoading && (
-        <p style={{ color: '#666' }}>Loading agents...</p>
+        <p className="loading-state">Loading agents...</p>
       )}
 
       {!agentsLoading && !agentsError && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div>
-            <label htmlFor="agent-select" style={{ display: 'block', fontWeight: 600, marginBottom: 6 }}>Agent</label>
+        <div className="flex flex-col gap-5">
+          <div className="form-group">
+            <label htmlFor="agent-select" className="form-label">Agent</label>
             <select
               id="agent-select"
               value={selectedAgent}
               onChange={e => setSelectedAgent(e.target.value)}
               disabled={loading}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 6,
-                border: '1px solid #ccc',
-                fontSize: 14,
-                background: '#fff',
-                boxSizing: 'border-box',
-              }}
+              className="form-select"
             >
               {agents.map(a => (
                 <option key={a} value={a}>{a}</option>
@@ -225,8 +197,8 @@ function TaskRunnerPage() {
             </select>
           </div>
 
-          <div>
-            <label htmlFor="task-input" style={{ display: 'block', fontWeight: 600, marginBottom: 6 }}>Task Input</label>
+          <div className="form-group">
+            <label htmlFor="task-input" className="form-label">Task Input</label>
             <textarea
               id="task-input"
               value={taskInput}
@@ -235,59 +207,29 @@ function TaskRunnerPage() {
               disabled={loading}
               placeholder="Describe the task you want the agent to execute..."
               rows={5}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 6,
-                border: '1px solid #ccc',
-                fontSize: 14,
-                fontFamily: 'system-ui, sans-serif',
-                resize: 'vertical',
-                boxSizing: 'border-box',
-              }}
+              className="form-textarea"
             />
-            <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>Ctrl+Enter to submit</div>
+            <span className="form-hint">Ctrl+Enter to submit</span>
           </div>
 
           <button
             onClick={handleSubmit}
             disabled={loading || !selectedAgent || !taskInput.trim()}
-            style={{
-              padding: '12px 24px',
-              cursor: loading || !selectedAgent || !taskInput.trim() ? 'not-allowed' : 'pointer',
-              opacity: loading || !selectedAgent || !taskInput.trim() ? 0.6 : 1,
-              borderRadius: 6,
-              border: 'none',
-              background: '#4a6cf7',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 15,
-              alignSelf: 'flex-start',
-            }}
+            className="btn btn--primary self-start"
           >
-            {loading ? 'Running...' : 'Run Task'}
+            {loading ? 'Running\u2026' : 'Run Task'}
           </button>
 
           {resultError && (
-            <div style={{ background: '#fff0f0', color: '#cc0000', padding: 12, borderRadius: 6, border: '1px solid #ffcccc' }}>
+            <div className="alert alert--danger">
               {resultError}
             </div>
           )}
 
           {result && (
-            <div>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: 14, fontWeight: 600 }}>Result</h3>
-              <pre style={{
-                background: '#1e1e2e',
-                color: '#cdd6f4',
-                padding: 16,
-                borderRadius: 6,
-                fontSize: 13,
-                overflow: 'auto',
-                maxHeight: 400,
-                whiteSpace: 'pre-wrap',
-                wordWrap: 'break-word',
-              }}>
+            <div className="flex flex-col gap-2">
+              <h3>Result</h3>
+              <pre className="result-panel code-block">
                 {result}
               </pre>
             </div>
