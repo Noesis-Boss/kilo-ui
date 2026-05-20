@@ -1,31 +1,52 @@
-import { useState, useEffect } from 'react'
-import { listSessions } from './api/kilo'
-import type { Session } from './api/kilo'
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom'
+import SessionsPage from './pages/SessionsPage'
+import AgentsPage from './pages/AgentsPage'
+import TaskRunnerPage from './pages/TaskRunnerPage'
 
 function App() {
-  const [sessions, setSessions] = useState<Session[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    listSessions()
-      .then(setSessions)
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
-
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
-      <h1>Kilo Web UI</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {sessions.map(s => (
-            <li key={s.id}>{s.slug} ({s.projectID})</li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <Router>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: 20 }}>
+        <nav style={{ marginBottom: 20, borderBottom: '1px solid #ccc', paddingBottom: 10 }}>
+          <NavLink 
+            to="/" 
+            end
+            style={({ isActive }) => ({ 
+              marginRight: 15, 
+              textDecoration: isActive ? 'underline' : 'none',
+              fontWeight: isActive ? 'bold' : 'normal'
+            })}
+          >
+            Sessions
+          </NavLink>
+          <NavLink 
+            to="/agents" 
+            style={({ isActive }) => ({ 
+              marginRight: 15, 
+              textDecoration: isActive ? 'underline' : 'none',
+              fontWeight: isActive ? 'bold' : 'normal'
+            })}
+          >
+            Agents
+          </NavLink>
+          <NavLink 
+            to="/tasks" 
+            style={({ isActive }) => ({ 
+              textDecoration: isActive ? 'underline' : 'none',
+              fontWeight: isActive ? 'bold' : 'normal'
+            })}
+          >
+            Task Runner
+          </NavLink>
+        </nav>
+
+        <Routes>
+          <Route path="/" element={<SessionsPage />} />
+          <Route path="/agents" element={<AgentsPage />} />
+          <Route path="/tasks" element={<TaskRunnerPage />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 
