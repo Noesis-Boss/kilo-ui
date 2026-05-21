@@ -2,12 +2,35 @@ import { useState, useEffect, useCallback } from 'react'
 import { listSessions, listAgents, runTask, createSession, type Session } from './api/kilo'
 import TaskRunner from './components/TaskRunner'
 import SessionDetail from './components/SessionDetail'
+import FileBrowser from './components/FileBrowser'
 
 type Tab = 'sessions' | 'taskRunner'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('sessions')
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
+  const [showFileBrowser, setShowFileBrowser] = useState(false)
+
+  if (showFileBrowser) {
+    return <FileBrowser />
+  }
+
+  if (selectedSessionId) {
+    return (
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
+        <h1>Kilo Web UI</h1>
+        <SessionDetail sessionId={selectedSessionId} onBack={() => setSelectedSessionId(null)} />
+      </div>
+    )
+  }
+
+function App() {
+  const [activeTab, setActiveTab] = useState<Tab>('sessions')
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
+
+  if (showFileBrowser) {
+    return <FileBrowser />
+  }
 
   if (selectedSessionId) {
     return (
@@ -40,6 +63,8 @@ function App() {
     </div>
   )
 }
+
+function SessionsView() {
 
 function SessionsView() {
   const [sessions, setSessions] = useState<Session[]>([])
@@ -152,7 +177,7 @@ function SessionsView() {
           {sessions.map(s => (
             <li
               key={s.id}
-              onClick={() => setSelectedSession(s.id)}
+              onClick={() => setSelectedSessionId(s.id)}
               style={{
                 cursor: 'pointer',
                 padding: '8px',
