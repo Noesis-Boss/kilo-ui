@@ -131,8 +131,6 @@ export default function FileBrowser({ initialPath = '.' }: FileBrowserProps) {
     }
   }, [renamingFile, newFileNameInput, currentPath, loadFiles])
 
-  const pathParts = currentPath === '.' ? [] : currentPath.split('/')
-
   return (
     <div style={{ display: 'flex', height: '100vh', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ 
@@ -322,7 +320,17 @@ export default function FileBrowser({ initialPath = '.' }: FileBrowserProps) {
               autoFocus
             />
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={handleRenameFile} style={{ flex: 1, padding: '8px 16px' }}>Rename</button>
+              <button
+                onClick={handleRenameFile}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    handleRenameFile()
+                  }
+                }}
+                style={{ flex: 1, padding: '8px 16px' }}
+              >Rename</button>
               <button onClick={() => setRenamingFile(null)} style={{ flex: 1, padding: '8px 16px' }}>Cancel</button>
             </div>
           </div>
