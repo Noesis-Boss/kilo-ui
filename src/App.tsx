@@ -1,10 +1,45 @@
 import { useState, useEffect, useCallback } from 'react'
 import { listSessions, listAgents, runTask, createSession, type Session } from './api/kilo'
+import TaskRunner from './components/TaskRunner'
+import SessionDetail from './components/SessionDetail'
+import FileBrowser from './components/FileBrowser'
 
 type Tab = 'sessions' | 'taskRunner'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('sessions')
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
+  const [showFileBrowser, setShowFileBrowser] = useState(false)
+
+  if (showFileBrowser) {
+    return <FileBrowser />
+  }
+
+  if (selectedSessionId) {
+    return (
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
+        <h1>Kilo Web UI</h1>
+        <SessionDetail sessionId={selectedSessionId} onBack={() => setSelectedSessionId(null)} />
+      </div>
+    )
+  }
+
+function App() {
+  const [activeTab, setActiveTab] = useState<Tab>('sessions')
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
+
+  if (showFileBrowser) {
+    return <FileBrowser />
+  }
+
+  if (selectedSessionId) {
+    return (
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
+        <h1>Kilo Web UI</h1>
+        <SessionDetail sessionId={selectedSessionId} onBack={() => setSelectedSessionId(null)} />
+      </div>
+    )
+  }
 
   return (
     <div className="app-layout">
@@ -28,6 +63,8 @@ function App() {
     </div>
   )
 }
+
+function SessionsView() {
 
 function SessionsView() {
   const [sessions, setSessions] = useState<Session[]>([])
@@ -140,26 +177,14 @@ function SessionsView() {
           {sessions.map(s => (
             <li
               key={s.id}
-              onClick={() => setSelectedSession(selectedSession?.id === s.id ? null : s)}
-              className={[
-                'card',
-                'card--clickable',
-                selectedSession?.id === s.id ? 'card--selected' : '',
-              ].join(' ')}
+              onClick={() => setSelectedSessionId(s.id)}
+              style={{
+                cursor: 'pointer',
+                padding: '8px',
+                borderBottom: '1px solid #eee'
+              }}
             >
-              <span>
-                <strong>{s.slug}</strong>
-                <span className="text-secondary ml-3">({s.projectID})</span>
-              </span>
-              {selectedSession?.id === s.id && (
-                <div className="detail-panel">
-                  <div className="detail-panel__row"><strong>ID:</strong> {s.id}</div>
-                  <div className="detail-panel__row"><strong>Project ID:</strong> {s.projectID}</div>
-                  <div className="detail-panel__row"><strong>Pattern:</strong> {s.pattern}</div>
-                  <div className="detail-panel__row"><strong>Action:</strong> {s.action}</div>
-                  <div className="detail-panel__row"><strong>Slug:</strong> {s.slug}</div>
-                </div>
-              )}
+              {s.slug} ({s.projectID})
             </li>
           ))}
         </ul>
