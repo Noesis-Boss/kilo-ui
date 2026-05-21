@@ -3,11 +3,13 @@ import { listSessions } from './api/kilo'
 import type { Session } from './api/kilo'
 import TaskRunner from './components/TaskRunner'
 import SessionDetail from './components/SessionDetail'
+import FileBrowser from './components/FileBrowser'
 
 function App() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
+  const [showFileBrowser, setShowFileBrowser] = useState(false)
 
   useEffect(() => {
     listSessions()
@@ -15,6 +17,10 @@ function App() {
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+
+  if (showFileBrowser) {
+    return <FileBrowser />
+  }
 
   if (selectedSessionId) {
     return (
@@ -28,6 +34,14 @@ function App() {
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
       <h1>Kilo Web UI</h1>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
+        <button 
+          onClick={() => setShowFileBrowser(true)}
+          style={{ padding: '8px 16px', cursor: 'pointer' }}
+        >
+          File Browser
+        </button>
+      </div>
       <TaskRunner />
       {loading ? (
         <p>Loading sessions...</p>
