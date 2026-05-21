@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { listSessions, listAgents, runTask, createSession, type Session } from './api/kilo'
+import TaskRunner from './components/TaskRunner'
 
 type Tab = 'sessions' | 'taskRunner'
 
