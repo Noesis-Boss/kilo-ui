@@ -82,25 +82,26 @@ export default function SessionDetail({ sessionId, onBack }: SessionDetailProps)
         backgroundColor: '#fafafa'
       }}>
         {messages.map(msg => (
-          <div 
-            key={msg.id} 
-            style={{ 
-              marginBottom: 12, 
-              padding: 12, 
-              borderRadius: 8,
-              maxWidth: '80%',
-              backgroundColor: msg.type === 'user' ? '#007bff' : '#28a745',
-              color: 'white'
-            }}
-          >
-            <div style={{ fontWeight: 'bold', marginBottom: 4 }}>
-              {msg.type === 'user' ? 'You' : 'Agent'}
-            </div>
-            <div>{msg.content}</div>
-            <div style={{ fontSize: '0.8em', opacity: 0.8, marginTop: 4 }}>
-              {new Date(msg.timestamp).toLocaleTimeString()}
-            </div>
-          </div>
+<div 
+           key={msg.id} 
+           style={{ 
+             marginBottom: 12, 
+             padding: 12, 
+             borderRadius: 8,
+             maxWidth: '80%',
+             marginLeft: msg.type === 'user' ? 'auto' : 0,
+             backgroundColor: msg.type === 'user' ? '#007bff' : '#e9ecef',
+             color: msg.type === 'user' ? 'white' : '#333'
+           }}
+         >
+           <div style={{ fontWeight: 'bold', marginBottom: 4 }}>
+             {msg.type === 'user' ? 'You' : 'Agent'}
+           </div>
+           <div>{msg.content}</div>
+           <div style={{ fontSize: '0.8em', opacity: 0.8, marginTop: 4 }}>
+             {new Date(msg.timestamp).toLocaleTimeString()}
+           </div>
+         </div>
         ))}
       </div>
 
